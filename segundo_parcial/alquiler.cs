@@ -7,11 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Data.SqlClient;
+
 
 namespace segundo_parcial
 {
     public partial class alquiler : Form
     {
+        SqlConnection comb_conexion = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\db_sistema_peliculas.mdf;Integrated Security=True");
         Conexion_db objConexion = new Conexion_db();
         int posicion = 0;
         string accion = "agregar";
@@ -19,6 +22,52 @@ namespace segundo_parcial
         public alquiler()
         {
             InitializeComponent();
+            datos_combo1();
+            datos_combo2();
+        }
+
+        public void datos_combo1()
+        {
+            comb_conexion.Open();
+
+            SqlCommand cmd = new SqlCommand("SELECT idCliente,nombre FROM clientes", comb_conexion);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+
+
+            DataRow fila = dt.NewRow();
+            fila["nombre"] = "Seleccionar Cliente";
+            dt.Rows.InsertAt(fila, 0);
+
+
+            comboBox1.ValueMember = "idCliente";
+            comboBox1.DisplayMember = "nombre";
+            comboBox1.DataSource = dt;
+
+            comb_conexion.Close();
+        }
+
+        public void datos_combo2()
+        {
+            comb_conexion.Open();
+
+            SqlCommand cmd = new SqlCommand("SELECT descripcion FROM peliculas", comb_conexion);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+
+
+            DataRow fila = dt.NewRow();
+            fila["descripcion"] = "Seleccionar Pelicula";
+            dt.Rows.InsertAt(fila, 0);
+
+
+            comboBox2.ValueMember = "idPelicula";
+            comboBox2.DisplayMember = "descripcion";
+            comboBox2.DataSource = dt;
+
+            comb_conexion.Close();
         }
 
         private void alquiler_Load(object sender, EventArgs e)
@@ -40,7 +89,7 @@ namespace segundo_parcial
             {
 
 
-            lblidAlquiler.Text = tbl.Rows[posicion].ItemArray[0].ToString();
+            lblidAlquiler.Text = "ID: " + tbl.Rows[posicion].ItemArray[0].ToString();
             txtfechaprestamo.Text = tbl.Rows[posicion].ItemArray[1].ToString();
             txtfechadevolucion.Text = tbl.Rows[posicion].ItemArray[2].ToString();
             txtvalor.Text = tbl.Rows[posicion].ItemArray[3].ToString();
